@@ -1,0 +1,59 @@
+section .data   ;this section is used to declare data or constants
+     msg  db 10,10,"Enter the string:"
+     msg_len equ $-msg
+     smsg db 10,10,"Thelength of string is:"
+     smsg_len equ $-smsg
+ 
+Section .bss ;this section is used to declare variables
+ string resb 50 ; reserved 50 byte
+ stringl equ $-string
+ count resb 1 ; reserved 1 byte, memory allocation
+ char_ans resb 2 ; reserved 2 byte
+%macro Write 2;Systemcall for Write operation
+ mov rax, 1 ;rindicates 64 bit register, system call for Write
+ mov rdi, 1 ;system call for stdout
+ mov rsi, %1;Resource Index Register
+ mov rdx, %2;
+ syscall
+%endmacro
+ %macro Read 2 ;Systemcallfor Readoperation
+ mov rax, 0 ;rindicates 64 bit register, system call for Read
+ mov rdi, 0
+ mov rsi, %1
+ mov rdx, %2
+ syscall
+ %endmacro
+ %macro Exit 0 ;SystemcallforExit operation
+ mov rax, 60
+ mov rdi, 0
+ syscall
+ %endmacro
+section .text ;this section is used for keeping the actual code
+ global _start ; tells the kernel where program execution begins
+ _start:
+        Write msg, msg_len ; print the first message
+        Read string, stringl
+        mov[count], rax
+        Write smsg, smsg_len ; Print the second message
+        mov rax, [count]
+        call Display  ; calling the Display
+        Exit    
+ Display:
+ mov rbx,16   ; divisor=16 for hex
+ mov rcx,2     ; number of digits
+ mov rsi,char_ans+1   ; load last byte address of char_ans buffer in rsi
+ cnt:mov rdx,0 ; make rdx=0 (as in div instruction rdx:rax/rbx)
+
+ div rbx
+ cmp dl, 09h   ; check for remainder in rdx
+ jbe  add30
+ add dl, 07h
+ 
+ add30:
+    add  dl,30h         ; calculate ASCII code
+    mov  [rsi],dl       ; store it in buffer
+    dec  rsi            ; point to one byte back
+    dec  rcx            ; decrement count
+    jnz   cnt           ; if not zero repeat
+    Write char_ans,2    ; display/print result on screen
+ ret
