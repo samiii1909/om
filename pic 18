@@ -1,0 +1,43 @@
+#include<p18F4550.h>
+ #include<stdio.h>
+ #define Fosc 48000000UL
+ void InitUART(unsigned int baudrate)//function definition
+ {
+ TRISCbits.RC6 = 0;
+ TRISCbits.RC7 = 1;
+ //TX pin set as output
+ //RX pin set as input
+ SPBRG=(unsigned char)(((Fosc /64)/baudrate)-1);
+ BAUDCON=0b00000000; //Non-inverted data; 8-bit baudrate generator
+ TXSTA=0b00100000; //Asynchronous 8-bit; Transmit enabled; Low speed baudrate select
+ RCSTA=0b10010000;
+ }
+ //Serial port enabled; 8-bit data; single receive enabled
+ void SendChar(unsigned char data)
+ {
+ while(TXSTAbits.TRMT == 0);
+ TXREG=data;
+ //Wait while transmit register is empty
+ //Transmit data
+ }
+ void putch(unsigned char data)
+ {
+ SendChar(data);
+ }
+ unsigned char GetChar(void)
+ {
+ while(!PIR1bits.RCIF);
+ return RCREG;
+ }
+ void main(void)
+ {
+ InitUART(9600);
+ //Wait till receive buffer becomes full
+ //Returned received data
+ printf("\r\nHello MicroPIC-18F: Enter any Key from Keyboard\r\n");
+ while(1)
+ {
+ }
+ printf("%c",GetChar());
+ //Receive character from PC and echo back
+ while(1); }
