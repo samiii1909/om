@@ -1,0 +1,57 @@
+#include<REG51.h>
+#define Enable 0x08
+#define RS 0x04
+void DelayMs(delay){
+   int i,j;
+   for(i=0;i<delay;i++){
+   for(j=0;j<100;j++);
+   }
+}
+
+void write_lcd_data(value){
+   /data for lcd/
+   P0=value;
+   DelayMs(5);
+   P3=Enable | RS;
+   DelayMs(1);
+   P3=00;
+}
+
+void write_lcd_command(value){
+  /command for lcd/
+  P0=value;
+	DelayMs(10);
+	P3=Enable;
+	DelayMs(1);
+	P3=00;
+}
+
+void blink_display(){
+  /function set for lcd/
+  write_lcd_command(0x08);
+  DelayMs(600);
+  write_lcd_command(0x0F); //display on
+  DelayMs(600);
+}
+
+void main(void){
+  P0=0x00;
+  P3=0x00;
+  write_lcd_command(0x38); //function set
+  write_lcd_command(0x08); //display off
+  write_lcd_command(0x01); //display clear
+  write_lcd_command(0x06); //entry mode set
+  write_lcd_command(0x0F); //display on
+  write_lcd_command(0x81); //set address counter value 
+  write_lcd_data('A');  
+  write_lcd_data('S');  
+  write_lcd_data('H');  
+  write_lcd_command(0xC3); //set address counter value
+  write_lcd_data('3');
+  write_lcd_data('1');
+  write_lcd_data('0');
+  
+  while(1){
+    blink_display();
+  }
+}
