@@ -1,0 +1,16 @@
+section .data ;this section is used to declare data or constants
+msg db "Rahul"
+, 0ah ;
+section .text ; this section is used for keeping the actual code
+global _start ; tells the kernel where program execution begins
+_start: ; program execution start from here
+mov rax, 1
+mov rdi, 1
+mov rsi, msg ; move the message in Resource Index Register
+mov rdx, 13
+syscall
+; system call for display/write operation
+mov rax, 60
+mov rdi, 0
+Syscall
+; system call for exit operation
