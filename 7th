@@ -1,0 +1,17 @@
+#include <reg51.h>
+
+sbit Plb0 = P1^0;
+
+void main(void) {
+    unsigned char conbyte = 0x44;
+    unsigned char x;
+    unsigned char ACC; // Declaration of ACC
+    
+    ACC = conbyte; // Assignment of ACC
+    
+    for(x = 0; x < 8; x++) {
+        Plb0 = ACC & 0x80; // Assigning MSB of ACC to Plb0
+        ACC = ACC << 1; // Shifting ACC to the left for serialization
+        // Additional code for serial output goes here
+    }
+}
